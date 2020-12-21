@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"fmt"
-	"io"
+	"os"
 
 	"github.com/jackpal/bencode-go"
 )
@@ -32,13 +32,20 @@ type TorrentFile struct {
 }
 
 // Open parses a torrent file
-func Open(r io.Reader) (*bencodeTorrent, error) {
-	bto := bencodeTorrent{}
-	err := bencode.Unmarshal(r, &bto)
+func Open(path string) (TorrentFile, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return TorrentFile{}, err
 	}
-	return &bto, nil
+	defer file.Close()
+
+	bto := bencodeTorrent{}
+	err = bencode.Unmarshal(file, &bto)
+	if err != nil {
+		return TorrentFile{}, nil
+	}
+
+	return bto.toTorrentFile()
 }
 
 func (i *bencodeInfo) hash() ([20]byte, error) {
@@ -61,7 +68,7 @@ func (i *bencodeInfo) splitPieceHashes() ([][20]byte, error) {
 		return nil, err
 	}
 
-	numHashes := len(buf)
+	numHashes := len(buf) / hashLen
 	hashes := make([][20]byte, numHashes)
 
 	for i := 0; i < numHashes; i++ {
