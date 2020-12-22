@@ -15,4 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = tf.DownloadToFile("test")
 }

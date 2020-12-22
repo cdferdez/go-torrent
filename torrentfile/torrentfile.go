@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"fmt"
+	"math/rand"
 	"os"
 
 	"github.com/jackpal/bencode-go"
 )
+
+// Port to listen on
+const Port uint16 = 6881
 
 type bencodeInfo struct {
 	Pieces       string `bencode:"pieces"`
@@ -29,6 +33,23 @@ type TorrentFile struct {
 	PieceLength  int
 	Length       int
 	Name         string
+}
+
+// DownloadToFile downloads a torrent and writes it to a file
+func (t *TorrentFile) DownloadToFile(path string) error {
+	var peerID [20]byte
+
+	_, err := rand.Read(peerID[:])
+	if err != nil {
+		return err
+	}
+
+	_, err = t.requestPeers(peerID, Port)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Open parses a torrent file
