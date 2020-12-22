@@ -43,23 +43,19 @@ func (t *TorrentFile) requestPeers(peerID [20]byte, port uint16) ([]peers.Peer, 
 	}
 
 	fmt.Println("Requesting Peers")
-	fmt.Println(url)
+
 	c := &http.Client{Timeout: 15 * time.Second}
 	resp, err := c.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	fmt.Println(resp.Body)
 
 	trackerResp := bencodeTrackerResp{}
 	err = bencode.Unmarshal(resp.Body, &trackerResp)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("Interval:", trackerResp.Interval)
-	fmt.Println("Peers:", trackerResp.Peers)
 
 	return peers.Unmarshal([]byte(trackerResp.Peers))
 }

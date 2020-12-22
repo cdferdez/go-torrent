@@ -44,10 +44,12 @@ func (t *TorrentFile) DownloadToFile(path string) error {
 		return err
 	}
 
-	_, err = t.requestPeers(peerID, Port)
+	peers, err := t.requestPeers(peerID, Port)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Num Peers:", len(peers))
 
 	return nil
 }
