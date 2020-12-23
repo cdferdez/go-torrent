@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 
+	"github.com/cdferdez/go-torrent/client"
 	"github.com/jackpal/bencode-go"
 )
 
@@ -50,6 +51,8 @@ func (t *TorrentFile) DownloadToFile(path string) error {
 	}
 
 	fmt.Println("Num Peers:", len(peers))
+
+	_, err = client.New(peers[0], t.InfoHash, peerID)
 
 	return nil
 }
